@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.matlib import randn
+import matplotlib.pyplot as plt
 
 
 class KalmanFilter:
@@ -36,12 +37,17 @@ class KalmanFilter:
                                                                     u=u[i], z=z[i])
         return state_means, state_covs
 
-    def run_linear_arr(self, bel_means, bel_covs, u, z, num_iterations):
+    def run_linear_arr(self, bel_means, bel_covs, controls, observations, num_iterations):
+        posterior_means = np.ndarray(bel_means.shape)
+        posterior_means[0] = bel_means[0]
+        posterior_covs = np.ndarray(bel_covs.shape)
+        posterior_covs[0] = bel_covs[0]
         for i in range(1, num_iterations):
-            res = self.single_iter_linear(m_prev=np.transpose([bel_means[i - 1]]), S_prev=bel_covs[i - 1], u=u[i],
-                                          z=z[i])
-            bel_means[i] = res[0].reshape(2)
-            bel_covs[i] = res[1].reshape((2, 2))
+            res = self.single_iter_linear(m_prev=np.transpose([posterior_means[i - 1]]), S_prev=posterior_covs[i - 1], u=controls[i],
+                                          z=observations[i])
+            posterior_means[i] = res[0].reshape(2)
+            posterior_covs[i] = res[1].reshape((2, 2))
+        return posterior_means, posterior_covs
 
 
 if __name__ == '__main__':
@@ -66,5 +72,14 @@ if __name__ == '__main__':
     R = np.array([[1, 0], [0, 1]])
     kf = KalmanFilter(A=A, B=B, C=np.identity(2), R=R, Q=Q)
     covs = np.array([[[400, 0], [0, 25]]] * n)
-    kf.run_linear_arr(z, covs, u, z, n)
-    print(z)
+    m, c = kf.run_linear_arr(z, covs, u, z, n)
+    plt.figure(1)
+    plt.subplot(211)
+    plt.plot(np.arange(n), x_observations,  marker='+', linestyle='dashed', label='observed (noisy) x')
+    plt.plot(np.arange(n),m.T[0], marker='o', label='filtered x')
+    plt.legend(title='Legend:')
+    plt.subplot(212)
+    plt.plot(np.arange(n), v_observations,  marker='+', linestyle='dashed', label='observed (noisy) v')
+    plt.plot(np.arange(n),m.T[1], marker='o', label='filtered v')
+    plt.legend(title='Legend:')
+    plt.show()
