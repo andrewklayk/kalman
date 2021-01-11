@@ -1,0 +1,1 @@
+This is an implementation of a linear Kalman filter - soon, more complex versions will follow.
