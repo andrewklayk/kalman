@@ -1,26 +1,26 @@
 import numpy as np
 
 
-class ExtKF:
-    def __init__(self, g, g_prime, h, h_prime, R, Q):
+class ExtendedKF:
+    def __init__(self, g, g_derivative, h, h_derivative, R, Q):
         self.g = g  # state transition function g(u_t, mu_(t-1))
-        self.g_prime = g_prime  # state transition function jacobian
+        self.g_der = g_derivative  # state transition function derivative w.r.t. x
         self.h = h  # measurement function h(prior_mu_t)
-        self.h_prime = h_prime  # measurement function derivative
+        self.h_der = h_derivative  # measurement function derivative w.r.t. x
         self.R = R  # state transition uncertainty covariance matrix
         self.Q = Q  # measurement error covariance matrix
 
     def predict(self, m_prev, S_prev, u):
-        G = self.g_prime(u, m_prev)
+        G = self.g_der(u, m_prev)
         mu_prior = self.g(u, m_prev)
         S_prior = G.dot(S_prev).dot(G.T) + self.R
         return mu_prior, S_prior
 
     def update(self, m_prior, S_prior, z):
-        H = self.h_prime(m_prior)
+        H = self.h_der(m_prior)
         kalman_gain = (S_prior.dot(H.T)).dot(np.linalg.inv((H.dot(S_prior)).dot(H.T) + self.Q))
         m_post = m_prior + kalman_gain.dot(z - self.h(m_prior))
-        S_post = (np.identity(m_prior.shape[0]) - kalman_gain.dot(self.H)).dot(S_prior)
+        S_post = (np.identity(m_prior.shape[0]) - kalman_gain.dot(H)).dot(S_prior)
         return m_post, S_post
 
     def single_iter(self, m_prev, S_prev, u, z):

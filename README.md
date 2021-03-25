@@ -1,1 +1,1 @@
-This is an implementation of a linear Kalman filter - soon, more complex versions will follow.
+A Python implementation of several types of Kalman filters: Linear, Extended, Unscented
