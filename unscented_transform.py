@@ -28,7 +28,6 @@ def calc_sigma_points(x_mean: np.array, x_cov: np.array, _lambda: float, a: floa
     return sigma_vectors, w_m, w_c
 
 
-# TODO: Covariance doesn't seem to work correctly
 def unscented_transform(x_mean, x_cov, alpha, beta, k, transformation):
     dim = x_mean.shape[0]
     l = calculate_lambda(dim, alpha, k)

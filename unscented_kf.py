@@ -1,5 +1,5 @@
 import numpy as np
-from unscented_transform import unscented_transform, calc_sigma_points, calculate_lambda
+from unscented_transform import calc_sigma_points, calculate_lambda
 
 
 class UnscentedKF:
