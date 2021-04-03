@@ -14,20 +14,6 @@ class UnscentedKF:
         self.kappa = kappa
 
     def propagate(self, prev_mean, prev_cov, u, z):
-        # predict_mean, predict_cov, sp_state_propagated, wm_state, wc_state = unscented_transform(
-        #     prev_mean, prev_cov, 1e-1, 2, 0, self.state_trans_func
-        # )
-        # dif_state = sp_state_propagated - predict_mean
-        #
-        # obs_mean, obs_cov, sp_obs_propagated, wm_obs, wc_obs = unscented_transform(
-        #     predict_mean, predict_cov, 1e-1, 2, 0, self.obs_func
-        # )
-        # dif_obs = sp_obs_propagated - obs_mean
-        # cross_cov = (wc_obs * dif_state.T).dot(dif_obs) + self.Q
-        # kalman_gain = cross_cov.dot(np.linalg.inv(obs_cov))
-        # post_state = predict_mean + kalman_gain.dot(z - obs_mean)
-        # post_cov = predict_cov - kalman_gain.dot(obs_cov).dot(kalman_gain.T)
-        # return post_state, post_cov
         lam = calculate_lambda(L=self.L, alpha=self.alpha, k=self.kappa)
         # Calculate sigma points for state
         sigma_points_state, wm_state, wc_state = calc_sigma_points(x_mean=prev_mean, x_cov=prev_cov,

@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from linear_kf import LinearKF
-from extended_kf import ExtendedKF
-from unscented_kf import UnscentedKF
 
 if __name__ == '__main__':
     N = 100  # Number of observations / timeframes

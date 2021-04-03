@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from extended_kf import ExtendedKF
 from unscented_kf import UnscentedKF
 
 # State transition error covariance matrix
@@ -17,8 +16,7 @@ def tr_f(x, u):
     rng = np.random.default_rng()
     noise = rng.multivariate_normal([0, 0], R)
 
-    # return 1/x + u**2 + noise
-    return x + u**2 + noise
+    return x + u ** 2 + noise
 
 
 def obs_f(x):
@@ -37,28 +35,26 @@ if __name__ == '__main__':
     rng = np.random.default_rng()
 
     NUM_EXPERIMENTS = 100
-    sqdif_filtered = sqdif_observed = 0
+    absdif_filt = absdif_obs = 0
+
+    kf = UnscentedKF(f=tr_f, h=obs_f, R=R, Q=Q, L=n, alpha=np.sqrt(3), beta=2, kappa=1)
 
     for exp in range(NUM_EXPERIMENTS):
         # Generate true state based on initial state and state transition error
         for i in range(N - 1):
-            x[i + 1] = tr_f(x[i], u[i+1])
+            x[i + 1] = tr_f(x[i], u[i + 1])
             z[i + 1] = obs_f(x[i + 1])
 
-        # Generate measurements (observed state)
-        kf = UnscentedKF(f=tr_f, h=obs_f, R=R, Q=Q, L=n, alpha=np.sqrt(3), beta=2, kappa=1)
-
         start_cov = R
-
         m, c = kf.run(x[0], start_cov, u, z, N)
 
-        sqdif_filtered += np.mean((x - m) ** 2, axis=0)
-        sqdif_observed += np.mean((x - z) ** 2, axis=0)
+        absdif_filt += np.mean(abs(x - m), axis=0)
+        absdif_obs += np.mean(abs(x - z), axis=0)
 
-    print("Average squared error of observations: {0} over {1} experiments".format(
-        sqdif_observed / NUM_EXPERIMENTS, NUM_EXPERIMENTS))
-    print("Average squared error of filter-inferred vals: {0} over {1} experiments".format(
-        sqdif_filtered / NUM_EXPERIMENTS, NUM_EXPERIMENTS))
+    print("Average absolute error of observations: {0} over {1} experiments".format(
+        absdif_obs / NUM_EXPERIMENTS, NUM_EXPERIMENTS))
+    print("Average absolute error of filter-inferred vals: {0} over {1} experiments".format(
+        absdif_filt / NUM_EXPERIMENTS, NUM_EXPERIMENTS))
 
     plt.figure(1)
     plt.subplot(211)
