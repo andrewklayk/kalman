@@ -1,6 +1,6 @@
-import numpy as np
 import matplotlib.pyplot as plt
-from scipy.linalg import sqrtm, cholesky
+import numpy as np
+from scipy.linalg import cholesky
 
 
 def calculate_lambda(L: int, alpha: float = 1, k: float = 0):
@@ -23,7 +23,8 @@ def calc_sigma_points(x_mean: np.array, x_cov: np.array, _lambda: float, a: floa
     sigma_vectors[(dim + 1):] -= sq_rt_matrix[0:]
     w_m = np.full(shape=(2 * dim + 1), fill_value=1 / (2 * (dim + _lambda)))
     w_m[0] = _lambda / (dim + _lambda)
-    w_c = np.copy(w_m)
+    w_c = np.empty_like(w_m)
+    w_c[:] = w_m
     w_c[0] += 1 - a ** 2 + b
     return sigma_vectors, w_m, w_c
 
